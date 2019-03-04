@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WpfApplication1.Properties {
+namespace NaUKMA.CS.Practice01.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

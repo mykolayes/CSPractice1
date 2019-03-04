@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace WpfApplication1
+namespace NaUKMA.CS.Practice01
 {
     /// <summary>
     /// Interaction logic for App.xaml

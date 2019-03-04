@@ -1,83 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
-namespace WpfApplication1
+namespace NaUKMA.CS.Practice01
 {
     public class Model : INotifyPropertyChanged
     {
         public Model()
         {
-            //AddCommand = new AddAgeCommand(this);
             CurrentAge = DateTime.Today;
         }
 
-        //class AddAgeCommand : ICommand
-        //{
-        //    Model parent;
-
-        //    public AddAgeCommand(Model parent)
-        //    {
-        //        this.parent = parent;
-        //        parent.PropertyChanged += delegate { CanExecuteChanged?.Invoke(this, EventArgs.Empty); };
-        //    }
-
-        //    public event EventHandler CanExecuteChanged;
-
-        //    public bool CanExecute(object parameter) { return !string.IsNullOrEmpty(parent.CurrentDate); }
-
-        //    public void Execute(object parameter)
-        //    {
-        //        //parent.AddedNames.Add(parent.CurrentDate); ;
-        //        //parent.CurrentAge = DateTime.Today;
-        //    }
-        //}
-
-        //public ICommand AddCommand { get; private set; }
-
-        #region CurrentDate
-
-        public string CurrentDate
-        {
-            get { return _mCurrentDate; }
-            set
-            {
-                if (value.Equals(_mCurrentDate))
-                    return;
-
-                _mCurrentDate = value;
-                OnPropertyChanged(nameof(CurrentDate));
-
-                //CurrentAge = CalcAge(value);
-
-            }
-        }
-
-        string _mCurrentDate;
-
-        #endregion
-
-        //#region CurrentAgeDefault
-        //public DateTime CurrentAgeDefault
-        //{
-        //    get { return _mCurrentAgeDefault; }
-        //    set
-        //    {
-        //        //if (value == _mCurrentAge)
-        //        //    return;
-        //            _mCurrentAgeDefault = value;
-        //            OnPropertyChanged(nameof(CurrentAgeDefault));
-        //    }
-        //}
-        //DateTime _mCurrentAgeDefault;
-        //#endregion
+        //properties
 
         #region CurrentAge
 
@@ -85,28 +21,10 @@ namespace WpfApplication1
         {
             get { return _mCurrentAge; }
             set
-            {
-
-                string age = CalcAge(value);
-                if (!(value.Equals(DateTime.Today)))
-                {
-                    if (age.Equals("error"))
-                    {
-                        MessageBox.Show(
-                            "This program works only for people aged 1-135. Please, re-enter your birth date.");
-                        CurrentAgeStr = "";
-                    }
-                    else
-                    {
-                        CurrentAgeStr = age;
-                        //_mCurrentAge = value;
-                        //OnPropertyChanged(nameof(CurrentAge));
-                    }
-                }
-
+            {              
                 _mCurrentAge = value;
                 OnPropertyChanged(nameof(CurrentAge));
-
+                CurrentAgeTask(value);
 
             }
         }
@@ -122,8 +40,6 @@ namespace WpfApplication1
             get { return _mCurrentAgeStr; }
             set
             {
-                //if (value == _mCurrentAge)
-                //    return;
                 _mCurrentAgeStr = value;
                 OnPropertyChanged(nameof(CurrentAgeStr));
             }
@@ -192,8 +108,6 @@ namespace WpfApplication1
 
         #endregion
 
-        //public ObservableCollection<string> AddedNames { get; } = new ObservableCollection<string>();
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -201,21 +115,33 @@ namespace WpfApplication1
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        //additional functions
-        private string CalcAge(DateTime enteredDateTime)
+        //async tasks for properties
+        private async Task CurrentAgeTask(DateTime value)
         {
-            string res;
-
-            int year = DateTime.Now.Year - enteredDateTime.Year;
-
-            if (year > 135 || year < 1)
+            int result = DateTime.Compare(value, DateTime.Today);
+            if (result > 0)
             {
-                res = "error";
+                MessageBox.Show(
+                    "This program works only for people aged 0-135, born yesterday or earlier. Please, re-enter your birth date.");
+                CurrentAgeStr = "";
+                BdNote = "";
+                ChZod = "";
+                EuZod = "";
+            }
+            else if (result == 0)
+            {
+                //do nothing; required for the first launch.
+                CurrentAgeStr = "";
+                BdNote = "";
+                ChZod = "";
+                EuZod = "";
             }
             else
             {
-                if (DateTime.Now.Month.Equals(enteredDateTime.Month) &&
-                    DateTime.Now.Day.Equals(enteredDateTime.Day))
+                CurrentAgeStr = CalcAge(value);
+
+                if (DateTime.Now.Month.Equals(value.Month) &&
+                    DateTime.Now.Day.Equals(value.Day))
                 {
                     BdNote = "Happy bd!";
                 }
@@ -224,10 +150,27 @@ namespace WpfApplication1
                     BdNote = "";
                 }
 
-                ChZod = CalcChZod(enteredDateTime);
-                EuZod = CalcEuZod(enteredDateTime);
+                ChZod = CalcChZod(value);
+                EuZod = CalcEuZod(value);
+            }
 
-                res = (year).ToString();
+        }
+
+        //additional logic functions
+        private string CalcAge(DateTime enteredDateTime)
+        {
+            string res;
+
+            int age = DateTime.Now.Year - enteredDateTime.Year;
+            if (enteredDateTime > DateTime.Now.AddYears(-age)) age--;
+
+            if (age > 135 || age < 0)
+            {
+                res = "error";
+            }
+            else
+            {
+                res = (age).ToString();
             }
 
             return res;
