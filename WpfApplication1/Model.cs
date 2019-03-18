@@ -24,7 +24,7 @@ namespace NaUKMA.CS.Practice01
             {              
                 _mCurrentAge = value;
                 OnPropertyChanged(nameof(CurrentAge));
-                CurrentAgeTask(value);
+                Task.Run(() => CurrentAgeTask(value));
 
             }
         }
